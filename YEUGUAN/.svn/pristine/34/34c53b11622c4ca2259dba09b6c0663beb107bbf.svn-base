@@ -1,0 +1,53 @@
+
+$(document).ready(function(){
+	var modulecode;
+	var yea;
+	var candidates;
+	var title;
+
+	$(document).on("click",".open_btn", function() {
+		var id=this.id.split("/");
+		var modulecode=id[0];
+		var year=id[1];
+		var candidates=id[2];
+		var title=id[3];
+		
+		window.location.href = "/service/TA/endorsement?modulecode="+modulecode+"&&year="+year+"&&candidates="+candidates+"&&title="+title;
+		
+	});
+	
+function goBack() {
+    window.history.back();
+    $(this.id)
+}
+function getParam(param){
+	  return new URLSearchParams(window.location.search).get(param);
+	}
+if(!getParam("modulecode")==''){
+	$("#do_endorse").show();
+	$("#endorsement").hide();
+	modulecode=getParam("modulecode");
+	year=getParam("year");
+	candidates=getParam("candidates");
+	title=getParam("title");	
+}
+else{
+	$("#do_endorse").hide();
+}
+
+
+
+
+
+	$(document).on("click","#save_endorse", function() {
+	var attidude=$(".Attitude"+this.id);
+	var Punctuality=$(".Punctuality"+this.id);
+	var Solving=$(".Solving"+this.id);
+	 var Professors=$(".professors"+this.id);
+	 var Students=$(".Students"+this.id);	
+	alert(modulecode+" "+year+" "+candidates+" "+title);
+});
+
+
+
+});

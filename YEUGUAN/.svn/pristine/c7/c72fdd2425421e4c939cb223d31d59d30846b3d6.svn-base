@@ -1,0 +1,15 @@
+#dialog-confirm {
+    display:none
+}
+
+#show_detail_dialog {
+    display:none
+}
+#send_email_dialog
+{
+    display:none
+}
+
+tbody tr:hover {
+  background-color: #bedcfc;
+}

@@ -1,0 +1,94 @@
+package ta.Component;
+
+import java.security.Provider.Service;
+import java.sql.SQLException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+import ta.controller.Controller;
+import ta.domain.Domain_Enrol;
+import ta.domain.Domain_IDEs;
+import ta.domain.Domain_Registration;
+import ta.domain.Domain_Skills;
+import ta.domain.Domain_chosen_cadidates;
+import ta.domain.Domain_Applications;
+import ta.service.Service_Query;
+
+@Component
+public class ScheduledTasks {
+	@Autowired
+	private Service_Query service;
+
+	Domain_Applications Create_a_vacancy_domain = new Domain_Applications();
+
+	Domain_Skills Domain_skills = new Domain_Skills();
+
+	Domain_IDEs Domain_ides = new Domain_IDEs();
+
+	Domain_chosen_cadidates domain_chosen = new Domain_chosen_cadidates();
+	Domain_Enrol Domain_enrol = new Domain_Enrol();
+	Domain_Registration Domain_registration = new Domain_Registration();
+	@Autowired
+	private Controller controller;
+
+	private static final Logger log = LoggerFactory.getLogger(ScheduledTasks.class);
+
+	private static final SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+
+	// @Scheduled(cron = ""0 0 10-11 * * *"") //10am and 11am every single day
+	//@Scheduled(cron = "*/30 * * * * *")
+	public void check_application() throws SQLException, ParseException {
+		List<Domain_Applications> list_of_pending = service.application_check_deadline();
+		// System.out.println(dateFormat.format(new Date()));
+
+		if (list_of_pending.isEmpty()) {
+			log.info("No awaiting allocations today");
+		} else {
+			for (Domain_Applications each_pending : list_of_pending) {
+				Optional<Domain_Registration> find_email = service.findacandidateid(each_pending.getProfessor().getId());
+				if (find_email.isPresent()) {
+					System.out.println(find_email.get().getEmail());
+					controller.DeadlineAlarm(find_email.get().getEmail(), find_email.get().getName(), each_pending.getTitle(),
+							each_pending.getModulecode());
+					log.info("Awaiting " + each_pending.getModulecode() + " " + each_pending.getTitle());
+				}
+
+			}
+
+		}
+	}
+}
+
+//// System.out.println(each_pending.getId());
+//String status = controller.save_suitable_candidates(each_pending.getId());
+//
+//log.info("TA allocation of the module " + each_pending.getModulecode() + " status: " + status);
+//
+//if (status.equals("okay")) {
+//	List<Domain_chosen_cadidates> find_chosen_candidates = service
+//			.find_allocated_candidates_byyear_module(each_pending.getModulecode(),
+//					each_pending.getYear());
+//
+//	for (Domain_chosen_cadidates each_candidate : find_chosen_candidates) {
+//		Optional<Domain_Registration> candidate_detail = service
+//				.findacandidateid(each_candidate.getChosen_candidates());
+//		if (candidate_detail.isPresent()) {
+//			String name = candidate_detail.get().getName();
+//			String email = candidate_detail.get().getEmail();
+//			String id = candidate_detail.get().getId();
+//			controller.sendemail(email, name, each_pending.getTitle() + " " + each_pending.getYear(),
+//					id, each_pending.getDescription());
+//			log.info("email was sent to " + email + " candidates: " + id + " " + name);
+//
+//		}
+//	}
+//}

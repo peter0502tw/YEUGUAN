@@ -1,0 +1,28 @@
+package ta.repositories;
+
+import java.util.List;
+import java.util.Optional;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import ta.domain.Domain_Enrol;
+import ta.domain.Domain_chosen_cadidates;
+import ta.domain.Domain_interview;
+@Repository
+public interface Repo_interview extends  CrudRepository<Domain_interview,String> {
+	
+	   @Query(value = "SELECT * FROM TA_allocation.domain_interview where modulecode=:modulecode  &&  year=:year", nativeQuery = true)
+	   List<Domain_interview> find_interview_bymodulecode_year(@Param("modulecode") String modulecode,@Param("year") String year);
+
+//	   @Query(value = "SELECT * FROM TA_allocation.domain_chosen_cadidates where modulecode=:modulecode  && year=:year", nativeQuery = true)
+//	   List<Domain_chosen_cadidates> module_allocated_candidates(@Param("year") String year,@Param("modulecode") String modulecode);
+//	   
+//	   @Query(value = "SELECT * FROM TA_allocation.domain_interview where year=:year && candidates=:candidates  &&modulecode!=:modulecode ", nativeQuery = true)
+//	   List<Domain_interview> interview_candidate_except(@Param("modulecode") String modulecode,@Param("candidates") String candidates,@Param("year") String year);
+	   
+	   List<Domain_interview>  findBycandidates(String id);
+	  List<Domain_interview> findByyear(String year);
+}

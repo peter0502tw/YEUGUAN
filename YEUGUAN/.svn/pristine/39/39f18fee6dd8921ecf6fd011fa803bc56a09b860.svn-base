@@ -1,0 +1,516 @@
+	 <div style="display: none;" class="card mt-4" id="Create_a_vacancy_frame">
+            <div class="card-body">
+            
+              <h3 class="card-title">Create a vacancy</h3>
+              <h4>$24.99</h4>
+              
+                  
+              <h2><font size="2">Module code(Capital letters)</font></h2>             
+              <p><input type="text" id="module_code" name="module_code"  placeholder="Module code" required/> 
+               <a id="module_notice"></a><p/>                         
+<h2><font size="2">Module</font></h2>
+
+              <p><input type="text" id="title" name="required"  placeholder="Module's Name" required/>
+             
+            <h2><font size="2">Year</font></h2>
+              <p> <select id="year" name="required"></select>
+              <p/>
+<h2><font size="2">Total hours of the surgery</font></h2>
+ <p><input type="number"  id="total_hours" name="required"  placeholder="Total hours" required/><p/>
+ 
+  <div id='timesdiv'>
+    
+            <div class="buttons">
+          
+            <h2><font size="2">Time period</font></h2>
+ 
+    <select class="select" id="choose_a_day" name="choose_a_day">
+            <option value="Monday ">Monday</option>
+             <option value="Tuesday ">Tuesday</option>
+              <option value="Wednesday ">Wednesday</option>
+               <option value="Thursday ">Thursday</option>
+                <option value="Friday ">Friday</option>             
+    </select>
+ <input  id="time_start" type="text" id="time_start" class="timepicker" name="timepicker" placeholder="from" required /><a>~</a>
+            <input type="text" class="timepicker" id="time_end" name="timepicker" placeholder="to"  required />
+            
+             <input type="button" class="btn btn-third btnAdd" id="addtime" value="Add time &raquo"><br>
+             <input type="button" id="timebtn" value="show times">
+           <div id="divtimes"></div> 
+        </div>  
+        </div><!--timediv-->    
+      <script type="text/javascript">
+      
+      $(document).ready (function () {
+      var time_string="";
+      $('#addtime').click(function () {
+          var time_start=$("#time_start").val();
+          var time_end=$("#time_end").val();     
+          var check_time_start =new Date('01/01/2018 '+ time_start); 
+          var check_time_end =new Date('01/01/2018 '+ time_end);
+       if(check_time_end < check_time_start)
+          {
+           alert("End time should exceed the start time");   
+           return;
+          }
+          else if(check_time_end - check_time_start==0)
+          {
+        	  alert("Start time and end time cannot be same");
+               return;
+          }
+          
+          
+          
+          
+          $("#divtimes").append("<input type='button' class='btn btn-third times_elements' value='"+$("#choose_a_day").val()+time_start+"-"+time_end+"'>");      
+      });
+      
+
+      $(document).on("click",".times_elements", function() {
+          var confirmation = confirm('Are you sure you want to delete this action plan/s?');
+          if (confirmation == true) {
+            $(this).closest(".times_elements").remove();
+
+            
+            
+          }
+      });
+     
+      $('#timebtn').click(function () {
+          
+    	
+    	  
+    	  
+           $("#timesdiv .times_elements").each(function() {
+        	   time_string =time_string+"|"+$(this).val();
+               
+           });
+           
+           alert(time_string);
+      }); 
+      
+      });
+      </script>
+      
+  
+              <p><input type="checkbox" id="unallocated_student_only" name="required"/>
+            Unallocated student only</p>    
+              <p><input type="checkbox" id="masterphdonly" name="required"/>
+            Master/PHd students only</p> 
+            
+<h2><font size="2">Quantity of TAs</font></h2>
+ <p><input type="number" id="quntities_TA" name="required" placeholder="quntities of TAs"  required /><p/>
+
+         
+          
+             <div id='Skillsdiv'>
+              <h2><font size="2">Skills</font></h2>
+           <div class="buttons">
+          
+            <input type="text" class="findskills" id="skill_filling" placeholder="Skills"> 
+             <input type="button" class="btn btn-third btnAdd" id="addskill" value="Add a skill &raquo"><br>
+           <div id="divskill"></div> 
+        </div>       
+        <input type="button" id="testbtn">
+
+      </div><!-- skilldiv-->
+   <script>
+
+            $(document).ready (function () {
+                   
+                 var skill_string="";
+                 var ide_string="";
+            
+                 
+            $("#skill_filling").autocomplete({
+                source: function(request, response) {
+                   
+                    
+                }
+            }); 
+            
+            
+            
+            
+            $("#skill_filling").keyup(function(){
+                var skill=$("#skill_filling").val();
+                
+                
+                $("#skill_filling").autocomplete({
+                    source: function(request, response) {
+                        $.ajax({
+                            url:  "/findskills",
+                            type: "POST",
+                            data: {skill:skill},
+                            dataType: "Json",
+                          
+                            success: function( data ) {
+                                
+                                response( $.map( data, function( item ) {
+                                return {
+                                    label: item.skills,
+                                    value: item.skills,
+                                }
+                                }));
+                        },
+                            error: function (error) {alert('error: ' + error);},
+                  
+                        });
+                        
+                        
+                    }
+                }); 
+                
+                
+                
+                
+            });
+           
+          
+            $('#addskill').click(function () {
+                var skill=$("#skill_filling").val();
+                $("#divskill").append("<input type='button' class='btn btn-third skill_elements' value='"+$("#skill_filling").val()+"'>");
+                   
+                $.ajax({
+                    type: "Get",
+                    url: "/createskill",
+                 data:{skill:skill},
+             error: function(){alert("failure");}
+             }); 
+                   
+            });
+            
+
+            $(document).on("click",".skill_elements", function() {
+                var confirmation = confirm('Are you sure you want to delete this action plan/s?');
+                if (confirmation == true) {
+                  $(this).closest(".skill_elements").remove();
+
+                  
+                  
+                }
+            });
+           
+            $('#testbtn').click(function () {
+                
+                 $("#divskill .skill_elements").each(function() {
+                     skill_string =skill_string+"|"+$(this).val();
+                     
+                 });
+                 
+                 alert(skill_string);
+            });                                  
+           
+              });
+
+           
+        </script>
+        <div class="IDEdiv">
+           
+ <div class="idebuttons">
+          
+            <input type="text" class="findide" id="ide_filling" placeholder="IDEs"> 
+            
+             <input type="button" class="btn btn-third btnAdd" id="addide" value="Add a IDE &raquo"><br>
+           <div id="divide"></div> 
+        </div>
+        
+     <script>
+
+            $(document).ready (function () {
+                   
+                
+            
+                 
+            $("#ide_filling").autocomplete({
+                source: function(request, response) {
+                    $.ajax({
+                        url:  "/findIDE",
+                        type: "POST",
+                        data: {ide:ide},
+                        dataType: "Json",
+                      
+                        success: function( data ) {},
+                        error: function (error) {alert('error: ' + error);},                  
+                    });
+                    
+                    
+                }
+            }); 
+            
+            
+            
+            
+            $("#ide_filling").keyup(function(){
+                
+                var ide=$("#ide_filling").val();
+                
+                $("#ide_filling").autocomplete({
+                    source: function(request, response) {
+                        $.ajax({
+                            url:  "/findIDE",
+                            type: "POST",
+                            data: {ide:ide},
+                            dataType: "Json",
+                          
+                            success: function( data ) {
+                                
+                                response( $.map( data, function( item ) {
+                       return {
+                                    label: item.ides,
+                                    value: item.ides,
+                                }
+                                }));
+                        },
+                            error: function (error) {alert('error: ' + error);},
+                  
+                        });
+                        
+                        
+                    }
+                }); 
+                
+                
+                
+                
+            });
+           
+          
+            $('#addide').click(function () {
+                var ide=$("#ide_filling").val();
+                $("#divide").append("<input type='button' class='btn btn-third ide_elements' value='"+$("#ide_filling").val()+"'>");
+                   
+                $.ajax({
+                    type: "Get",
+                    url: "/createIDE",
+                 data:{ide:ide},
+             error: function(){alert("failure");}
+             }); 
+                   
+            });
+            
+
+            $(document).on("click",".ide_elements", function() {
+                var confirmation = confirm('Are you sure you want to delete this action plan/s?');
+                if (confirmation == true) {
+                  $(this).closest(".ide_elements").remove();
+
+                  
+                  
+                }
+            });
+           
+            $('#testbtn').click(function () {
+                 alert($("#ide_filling").val());
+                 $("#divide .ide_elements").each(function() {
+                     ide_string =ide_string+"|"+$(this).val();
+                     
+                 });
+                 
+                
+            });                                  
+           
+              });
+
+           
+        </script>
+
+   <div class="form-group"> <!-- Date input -->
+        <label class="control-label" for="date">Deadline of the application</label>
+        <input class="form-control" id="datepicker" name="required" placeholder="MM/DD/YYYY" type="text"/>
+      </div>
+      
+      <script>
+    $(document).ready(function(){
+      var date_input=$('#datepicker'); //our date input has the name "date"
+      var container=$('.bootstrap-iso form').length>0 ? $('.bootstrap-iso form').parent() : "body";
+      var options={
+        format: 'mm/dd/yyyy',
+        container: container,
+        todayHighlight: true,
+        autoclose: true,
+      };
+      date_input.datepicker(options);
+    })
+</script>
+ </div>  <!--IDE DIV  -->      
+       
+              
+               <input class="btn btn-secondary" id="create_vacan" role="button"  value="Create &raquo;"/>
+            <a id="create_status"></a>
+            
+             
+<script type="text/javascript">
+
+$('.timepicker').timepicker({
+    timeFormat: 'h:mm p',
+    interval: 30,
+    minTime: '9:00am',
+    maxTime: '6:00pm',
+    defaultTime: '9:00am',
+    startTime: '9:00am',
+    dynamic: false,
+    dropdown: true,
+    scrollbar: true
+}); 
+
+
+$(document).ready(
+function() {
+    
+    
+    
+    var module_code=$("#module_code");
+    var module_status=$("#module_notice");
+    
+    
+    
+     
+    
+    $("#Create_a_vacancy").click(
+            function() {
+                $("#Create_a_vacancy_frame").toggle();
+                                
+            });
+
+     $("#create_vacan").prop('disabled', true);
+    
+     var now = new Date();
+     for (var i=now.getFullYear(); i<=now.getFullYear()+1; i++) $("#year").append('<option value=' + i + '>' + i + '</option>');                
+                
+     
+     
+    
+    
+     
+     
+    $("#module_code").change(function(){     
+        $.ajax({
+        type: "POST",
+         url: "/findmodule",
+         data:module_code,
+         success: function(data){
+            
+                
+                 if(data=="used"){
+                 
+                module_status.html("the module has been used");
+                 $("#create_vacan").prop('disabled', true);
+             
+             }
+            
+             else{
+                    module_status.html("&#x2714");
+                     
+                 
+             }           
+    },
+    error: function(){alert("failure");}
+    });
+
+    });
+    
+    
+
+       
+     
+     $("input[name='required']").keyup(function()
+             {
+         if ($("#year").val()&&$("#module_code").val()&&$("#title").val()&&$("#total_hours").val()&&$("#time_start").val()&&$("#time_end").val()&&$("#quntities_TA").val() !=''){
+            
+             $("#create_vacan").prop('disabled', false);
+        } else {
+            
+             $("#create_vacan").prop('disabled', true);
+        }
+         
+             });
+     $("input[name='timepicker']").click(function()
+             {   
+         if ($("#year").val()&&$("#module_code").val()&&$("#title").val()&&$("#total_hours").val()&&$("#time_start").val()&&$("#time_end").val()&&$("#quntities_TA").val()  !=''){
+            
+             $("#create_vacan").prop('disabled', false);
+        } else {
+             
+             $("#create_vacan").prop('disabled', true);
+        }
+         
+         
+             });
+    
+    
+         $("#create_vacan").click(function(){
+               
+             var skill_string="";
+             var ide_string="";
+             var times="";
+             var year = $("#year").val() ;
+             var module_code=$("#module_code").val();
+                var title = $("#title").val();
+                var total_hours =$("#total_hours").val();
+               
+                var quntities_TA =$("#quntities_TA").val() ;
+                var datepicker=$("#datepicker").val();
+
+                var unallocated_student_only;
+                if ( $("#unallocated_student_only").is(':checked') ) { unallocated_student_only=1; }
+                else unallocated_student_only=0;
+   
+                var master_phd_only;
+                if ( $("#masterphdonly").is(':checked') ) { master_phd_only=1; }
+                else master_phd_only=0;
+                
+                var time_start =$("#time_start").val()  ;
+                var time_end =$("#time_end").val();
+                 var check_time_start =new Date('01/01/2018 '+ time_start); 
+                    var check_time_end =new Date('01/01/2018 '+ time_end);
+                 if(check_time_end < check_time_start)
+                    {
+                     $("#create_status").html("End time should exceed the start time");   
+                     return;
+                    }
+                    else if(check_time_end - check_time_start==0)
+                    {
+                         $("#create_status").html("Start time and end time cannot be same");
+                         return;
+                    }
+                
+                 $("#divide .ide_elements").each(function() {
+                     ide_string =ide_string+"|"+$(this).val();
+                     
+                 });
+                 $("#divskill .skill_elements").each(function() {
+                     skill_string =skill_string+"|"+$(this).val();
+                     
+                 });
+                 $("#timesdiv .times_elements").each(function() {
+              	   times =times+"|"+$(this).val();
+                     
+                 });
+                
+             $.ajax({
+                    type: "Get",
+                    url: "/create/vacancy",
+                 data:{year:year,module_code:module_code,datepicker:datepicker,title:title,total_hours:total_hours,times:times,unallocated_student_only:unallocated_student_only,master_phd_only:master_phd_only,quntities_TA:quntities_TA,skills:skill_string,IDE:ide_string},
+                 success: function(data){
+                     if(data==true)
+                     $("#create_status").html("successful");
+                     else{
+                         $("#create_status").html("unsuccessful");
+                     return;}
+             },
+             error: function(){alert("failure");}
+             }); 
+             
+             });
+         
+         
+    
+
+});
+</script>          
+            
+            
+            </div><!-- card body vacancy -->
+            </div><!-- create a vacancy frame -->
+			 
